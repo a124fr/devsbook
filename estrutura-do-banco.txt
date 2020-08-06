@@ -1,0 +1,37 @@
+- Users
+-- id
+-- email
+-- name
+-- password
+-- birthdate
+-- city
+-- work
+-- avatar
+-- cover
+-- token
+
+- UserRelations
+-- id
+-- user_from
+-- user_to
+
+- Posts
+-- id
+-- type(text, photo)
+-- created_at
+-- body
+
+- PostCommnets
+-- id
+-- id_post
+-- id_user
+-- created_at
+-- body
+
+- PostLikes
+-- id
+-- id_post
+-- id_user
+-- created_at
+
+-- https://github.com/suporteb7web/mvc
