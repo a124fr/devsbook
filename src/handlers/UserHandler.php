@@ -4,7 +4,7 @@ namespace src\handlers;
 
 use \src\models\User;
 
-class LoginHandler 
+class UserHandler 
 {
     public static function checkLogin()
      {
@@ -43,6 +43,12 @@ class LoginHandler
          }
 
          return false;
+     }
+
+     public function idlExists($id) 
+     {
+        $user = User::select()->where('id', $id)->one();
+        return $user ? true : false;
      }
 
      public function emailExists($email) 
