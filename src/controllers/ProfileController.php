@@ -21,12 +21,12 @@ class ProfileController extends Controller
     public function index($atts = []) 
     { 
         $page = intval(filter_input(INPUT_GET, 'page'));
-        $id = $this->loggedUser->id;
         
+        // DETECTA O USUÁRIO ACESSADO
+        $id = $this->loggedUser->id;        
         if(!empty($atts['id'])) {
             $id = $atts['id'];
-        } 
-
+        }
         //PESQUISA O USUÁRIO
         $user = UserHandler::getUser($id, true);
 
@@ -34,16 +34,46 @@ class ProfileController extends Controller
             $this->redirect('/');
         }
 
+        //APRESENTA A IDADE
         $dateFrom = new \Datetime($user->birthdate);
         $dateTo = new \DateTime('today');        
         $user->ageYears = $dateFrom->diff($dateTo)->y;
 
+        // PESQUISA O FEED DO USUÁRIO
         $feed = PostHandler::getUserFeed($id, $page, $this->loggedUser->id);
+
+        // VERIFICA SE EU SIGO O USUÁRIO
+        $isFollowing = false;
+        if($user->id != $this->loggedUser->id) {
+            $isFollowing = UserHandler::isFollowing($this->loggedUser->id, $user->id);            
+        }
 
         $this->render('profile', [
             'loggedUser' => $this->loggedUser,
             'user' => $user,
-            'feed' => $feed
+            'feed' => $feed,
+            'isFollowing' => $isFollowing
         ]);
+    }
+
+    public function follow($atts)
+    {
+        // Quem eu vou seguir
+        $to = intval($atts['id']);
+        
+        if(UserHandler::idExists($to)) {
+
+            if(UserHandler::isFollowing($this->loggedUser->id, $to)) {
+                // Não seguir
+                UserHandler::unfollow($this->loggedUser->id, $to);
+            } else {
+                // seguir
+                UserHandler::follow($this->loggedUser->id, $to);
+            }
+
+        }
+        
+        $this->redirect('/perfil/'.$to);
+
     }
 }

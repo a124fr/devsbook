@@ -87,7 +87,7 @@ class PostHandler
         $perPage = 2;
 
         // 1. PEGAR LISTA DE USUÁRIOS QUE EU SIGO.
-        $userList = UserRelation::select()->where('user_form', $idUser)->get();
+        $userList = UserRelation::select()->where('user_from', $idUser)->get();
         $users = [];
         foreach($userList as $userItem)
         {
