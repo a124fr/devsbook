@@ -3,6 +3,8 @@
 namespace src\handlers;
 
 use \src\models\User;
+use \src\models\UserRelation;
+use \src\handlers\PostHandler;
 
 class UserHandler 
 {
@@ -55,6 +57,58 @@ class UserHandler
      {
         $user = User::select()->where('email', $email)->one();
         return $user ? true : false;
+     }
+
+     public function getUser($id, $full = false)
+     {
+         $data = User::select()->where('id', $id)->one();
+
+         if($data) {
+            $user = new User();
+            $user->id = $data['id'];
+            $user->name = $data['name'];
+            $user->birthdate = $data['birthdate'];
+            $user->city = $data['city'];
+            $user->avatar = $data['avatar'];
+            $user->work = $data['work'];
+            $user->cover = $data['cover'];
+
+            if($full) {
+                $user->followers = [];
+                $user->following = [];
+                $user->photos = [];
+                
+                // followers - Pessoas as que segue x usuario.
+                $followers = UserRelation::select()->where('user_to', $id)->get();
+                foreach($followers as $follower) {
+                    $userData = User::select()->where('id', $follower['user_from'])->one();
+                    $newUser->id = $userData['id'];
+                    $newUser->name = $userData['name'];
+                    $newUser->avatar = $userData['avatar'];
+
+                    $user->followers[] = $newUser;
+                }
+
+                // following - quem é que eu sigo.
+                $following = UserRelation::select()->where('user_from', $id)->get();
+                foreach($following as $follower) {
+                    $userData = User::select()->where('id', $follower['user_to'])->one();
+                    $newUser->id = $userData['id'];
+                    $newUser->name = $userData['name'];
+                    $newUser->avatar = $userData['avatar'];
+
+                    $user->following[] = $newUser;
+                }
+
+
+                // photos                
+                $user->photos = PostHandler::getPhotosFrom($id);
+            }
+            
+            return $user;
+         }
+
+         return false;
      }
 
      public function addUser($name, $email, $password, $birthdate)
