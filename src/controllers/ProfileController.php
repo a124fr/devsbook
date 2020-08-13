@@ -76,4 +76,57 @@ class ProfileController extends Controller
         $this->redirect('/perfil/'.$to);
 
     }
+
+    public function friends($atts = []) {
+
+        // DETECTA O USUÁRIO ACESSADO
+        $id = $this->loggedUser->id;        
+        if(!empty($atts['id'])) {
+            $id = $atts['id'];
+        }
+        //PESQUISA O USUÁRIO
+        $user = UserHandler::getUser($id, true);
+
+        if(!$user) {
+            $this->redirect('/');
+        }
+
+        // VERIFICA SE EU SIGO O USUÁRIO
+        $isFollowing = false;
+        if($user->id != $this->loggedUser->id) {
+            $isFollowing = UserHandler::isFollowing($this->loggedUser->id, $user->id);            
+        }
+
+        $this->render('profile_friends', [
+            'loggedUser' => $this->loggedUser,
+            'user' => $user,            
+            'isFollowing' => $isFollowing
+        ]);
+    }
+
+    public function photos($atts = []) {
+        // DETECTA O USUÁRIO ACESSADO
+        $id = $this->loggedUser->id;        
+        if(!empty($atts['id'])) {
+            $id = $atts['id'];
+        }
+        //PESQUISA O USUÁRIO
+        $user = UserHandler::getUser($id, true);
+
+        if(!$user) {
+            $this->redirect('/');
+        }
+
+        // VERIFICA SE EU SIGO O USUÁRIO
+        $isFollowing = false;
+        if($user->id != $this->loggedUser->id) {
+            $isFollowing = UserHandler::isFollowing($this->loggedUser->id, $user->id);            
+        }
+
+        $this->render('profile_photos', [
+            'loggedUser' => $this->loggedUser,
+            'user' => $user,            
+            'isFollowing' => $isFollowing
+        ]);
+    }
 }
